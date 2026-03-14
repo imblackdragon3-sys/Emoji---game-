@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tap The Emoji Game</title>
+
+<style>
+
+
+#menu button{
+padding:15px 30px;
+font-size:20px;
+margin:10px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+#startBtn{background:#27ae60;color:white;}
+#stopBtn{background:#e74c3c;color:white;}
+
+body{
+text-align:center;
+font-family:Arial;
+color:white;
+background: linear-gradient(135deg,#1e3c72,#2a5298);
+height:100vh;
+margin:0;
+}
+
+h1{
+margin-top:20px;
+}
+
+button{
+padding:10px 20px;
+font-size:16px;
+margin:5px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+#startBtn{background:#27ae60;color:white;}
+#stopBtn{background:#c0392b;color:white;}
+
+#game{
+position:relative;
+width:320px;
+height:420px;
+margin:20px auto;
+background:rgba(255,255,255,0.1);
+border-radius:15px;
+backdrop-filter:blur(10px);
+overflow:hidden;
+}
+
+#emoji{
+position:absolute;
+font-size:40px;
+cursor:pointer;
+transition: transform 0.2s;
+}
+
+#emoji.tap{
+transform:scale(1.4);
+}
+
+#bonus{
+position:absolute;
+font-size:35px;
+display:none;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Tap The Emoji 🔥</h1>
+
+<button id="startBtn" onclick="startGame()">Start</button>
+<button id="stopBtn" onclick="stopGame()">Stop</button>
+
+<p>Score: <span id="score">0</span></p>
+<p>High Score: <span id="highscore">0</span></p>
+<p>Time: <span id="time">30</span></p>
+<p>Combo: <span id="combo">1x</span></p>
+
+<div id="game">
+<div id="emoji">🔥</div>
+<div id="bonus">💎</div>
+</div>
+
+<audio id="tapSound">
+<source src="https://www.soundjay.com/buttons/sounds/button-16.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+let score=0;
+let time=30;
+let combo=1;
+let timer;
+
+let emoji=document.getElementById("emoji");
+let bonus=document.getElementById("bonus");
+let tapSound=document.getElementById("tapSound");
+
+let highscore=localStorage.getItem("highscore") || 0;
+document.getElementById("highscore").innerText=highscore;
+
+function randomPosition(element){
+let x=Math.random()*270;
+let y=Math.random()*360;
+
+element.style.left=x+"px";
+element.style.top=y+"px";
+}
+
+function moveEmoji(){
+randomPosition(emoji);
+}
+
+emoji.onclick=function(){
+
+if(time<=0)return;
+
+tapSound.currentTime=0;
+tapSound.play();
+
+score+=combo;
+combo++;
+
+document.getElementById("score").innerText=score;
+document.getElementById("combo").innerText=combo+"x";
+
+emoji.classList.add("tap");
+setTimeout(()=>emoji.classList.remove("tap"),200);
+
+if(score>highscore){
+highscore=score;
+localStorage.setItem("highscore",highscore);
+document.getElementById("highscore").innerText=highscore;
+}
+
+moveEmoji();
+
+}
+
+bonus.onclick=function(){
+
+score+=10;
+document.getElementById("score").innerText=score;
+bonus.style.display="none";
+
+}
+
+setInterval(function(){
+
+if(Math.random()<0.3){
+
+randomPosition(bonus);
+bonus.style.display="block";
+
+setTimeout(()=>{
+bonus.style.display="none";
+},2000);
+
+}
+
+},3000);
+
+function startGame(){
+
+score=0;
+time=30;
+combo=1;
+
+document.getElementById("score").innerText=score;
+document.getElementById("time").innerText=time;
+document.getElementById("combo").innerText="1x";
+
+moveEmoji();
+
+timer=setInterval(function(){
+
+time--;
+document.getElementById("time").innerText=time;
+
+if(time<=0){
+clearInterval(timer);
+alert("Game Over! Score: "+score);
+}
+
+},1000);
+
+}
+
+function stopGame(){
+
+clearInterval(timer);
+alert("Game stopped!");
+
+}
+
+</script>
+
+</body>
+</html>
